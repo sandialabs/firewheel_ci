@@ -1,0 +1,53 @@
+name: Draft Release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
+      - unlabeled
+  # Allow reuse across the FIREWHEEL ecosystem
+  workflow_call:
+
+jobs:
+  update-release-draft:
+    name: Update the release notes
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    outputs:
+      latest_version: ${{ steps.draft_release.outputs.tag_name }}
+      release_notes: ${{ steps.draft_release.outputs.body }}
+    steps:
+      - name: Draft release notes
+        id: draft_release
+        uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5
+        with:
+          publish: ${{ steps.check-version.outputs.tag != '' }}
+          tag: ${{ steps.check-version.outputs.tag }}
+          disable-autolabeler: false
+          commitish: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  pr-checker:
+    name: Ensure proper PR labels
+    if: github.event_name == 'pull_request_target'
+    needs: update-release-draft
+    permissions:
+      pull-requests: read
+      checks: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker://agilepathway/pull-request-label-checker:v1.6.65
+        with:
+          any_of: feature,fix,style,changed,refactor,perf,test,build,ci,chore,revert,deprecated,removed,security,documentation,dependencies
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+  contents: read
