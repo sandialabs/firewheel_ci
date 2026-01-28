@@ -1,0 +1,35 @@
+name: Update Changelog
+
+on:
+  release:
+    types: [released]
+  # Allow reuse across the FIREWHEEL ecosystem
+  workflow_call:
+
+jobs:
+  update:
+    name: Update Changelog for the latest release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+      - name: Add the latest release notes to the Changelog
+        uses: stefanzweifel/changelog-updater-action@b3a7ae7d4afc1d6982949a79bcd939fbcb245871
+        with:
+          latest-version: ${{ github.event.release.tag_name }}
+          release-notes: ${{ github.event.release.body }}
+          compare-url-target-revision: ${{ github.event.release.target_commitish }}
+          parse-github-usernames: true
+      - name: Commit the updated Changelog
+        uses: stefanzweifel/git-auto-commit-action@c86fa26bedab90b9a250e22f66759c0c50699f15
+        with:
+          branch: ${{ github.event.release.target_commitish }}
+          commit_message: 'docs(changelog): update changelog for version ${{ inputs.latest_version }}'
+          file_pattern: CHANGELOG.md
+
+permissions:
+  contents: read
