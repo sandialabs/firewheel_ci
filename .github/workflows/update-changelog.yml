@@ -28,7 +28,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@c86fa26bedab90b9a250e22f66759c0c50699f15
         with:
           branch: ${{ github.event.release.target_commitish }}
-          commit_message: 'docs(changelog): update changelog for version ${{ inputs.latest_version }}'
+          commit_message: 'docs(changelog): Update Changelog for version ${{ github.event.release.tag_name }}'
           file_pattern: CHANGELOG.md
 
 permissions:
