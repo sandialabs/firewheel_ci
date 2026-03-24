@@ -1,0 +1,70 @@
+# A composite action to install, configure, and initialize FIREWHEEL.
+# This action assumes that minimega and discovery have already been installed.
+# ...
+
+name: Prepare FIREWHEEL
+
+description: Install, configure, and initialize FIREWHEEL
+
+inputs:
+  install-mode:
+    description: "The installation mode [source|pypi|github]"
+    required: true
+  pypi-package-name:
+    description: "The package name when installing from PyPI"
+    required: false
+    default: firewheel
+  pypi-version:
+    description: "The package version specifier when installing from PyPI (e.g., '==2.7.0'); empty indicates the latest version"
+    required: false
+    default: ""
+  source-repo:
+    description: "The main package repository"
+    required: false
+    default: "sandialabs/firewheel"
+  source-repo-ref:
+    description: "The source repository ref to use when installing from GitHub"
+    required: false
+    default: "main"
+
+
+runs:
+  using: composite
+  steps:
+    - name: Upgrade pip
+      run: |
+        pip install --upgrade pip
+      shell: bash
+    - name: Install FIREWHEEL from source (current checkout)
+      if: inputs.install-mode == 'source'
+      run: |
+        pip install .
+      shell: bash
+    - name: Install FIREWHEEL from PyPI (latest version)
+      if: inputs.install-mode == 'pypi'
+      run: |
+        pip install ${{ inputs.pypi-package-name }}${{ inputs.pypi-version }}
+      shell: bash
+    - name: Install FIREWHEEL from GitHub
+      if: inputs.install-mode == 'github'
+      run: |
+        pip install git+https://github.com/${{ inputs.source-repo }}@${{ inputs.source-repo-ref }}
+      shell: bash
+    - name: Configure FIREWHEEL
+      run: |
+        sudo ln -s $(which firewheel) /usr/local/bin/firewheel
+        ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -N ""
+        ssh-keyscan -t rsa $(hostname) >> $HOME/.ssh/known_hosts
+        cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+        firewheel config set -s cluster.compute $(hostname)
+        firewheel config set -s cluster.control $(hostname)
+        firewheel config set -s grpc.hostname $GRPC_HOSTNAME
+        firewheel config set -s minimega.experiment_interface $EXPERIMENT_INTERFACE
+        firewheel config set -s logging.root_dir $LOG_DIR
+      shell: bash
+    - name: Initialize FIREWHEEL
+      run: |
+        firewheel init
+        firewheel sync  # will produce `chgrp` errors (but permissions are sufficient)
+        firewheel start
+      shell: bash
