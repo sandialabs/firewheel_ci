@@ -1,8 +1,6 @@
 name: Update Changelog
 
 on:
-  release:
-    types: [released]
   # Allow reuse across the FIREWHEEL ecosystem
   workflow_call:
 

@@ -1,16 +1,6 @@
 name: Draft Release
 
 on:
-  push:
-    branches:
-      - main
-  pull_request_target:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - labeled
-      - unlabeled
   # Allow reuse across the FIREWHEEL ecosystem
   workflow_call:
 

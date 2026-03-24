@@ -1,12 +1,6 @@
 name: "Check Pull Request Title"
 
 on:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - synchronize
-      - reopened
   # Allow reuse across the FIREWHEEL ecosystem
   workflow_call:
 
