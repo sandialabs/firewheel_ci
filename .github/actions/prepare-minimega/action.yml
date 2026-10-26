@@ -9,8 +9,8 @@ runs:
   steps:
     - name: Install minimega
       run: |
-        wget https://github.com/sandia-minimega/minimega/releases/download/2.9/minimega-2.9.deb
-        sudo dpkg -i minimega-2.9.deb
+        wget https://github.com/sandia-minimega/minimega/releases/download/3.3.0/minimega_3.3.0_amd64.deb -O minimega.deb
+        sudo dpkg -i minimega.deb
         sudo chown -R $USER:minimega $MM_INSTALL_DIR
         sudo ln -s $MM_INSTALL_DIR/bin/minimega /usr/local/bin/minimega
         sudo ln -s $MM_INSTALL_DIR/bin/minimega /usr/local/bin/mm
