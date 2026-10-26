@@ -32,7 +32,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Prepare to use tox-based environments
-      uses: $/firewheel_ci/.github/actions/prepare-tox
+      uses: ./firewheel_ci/.github/actions/prepare-tox
     - name: Lint code
       run: |
         tox -e lint
