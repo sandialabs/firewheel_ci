@@ -17,19 +17,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout package
-      uses: actions/checkout@v6
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        persist-credentials: false
     - name: Checkout FIREWHEEL CI
-      uses: actions/checkout@v6
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         repository: sandialabs/firewheel_ci
         path: firewheel_ci
         ref: ${{ inputs.actions-ref }}
+        persist-credentials: false
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
       with:
         python-version: ${{ matrix.python-version }}
     - name: Prepare to use tox-based environments
-      uses: ./firewheel_ci/.github/actions/prepare-tox
+      uses: $/firewheel_ci/.github/actions/prepare-tox
     - name: Lint code
       run: |
         tox -e lint
